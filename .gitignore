@@ -9,10 +9,7 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 /.prepl-port
-.hgignore
-.hg/
 .env
 *.csv
 .lsp/.cache
 .clj-kondo/
-scratch.csv
