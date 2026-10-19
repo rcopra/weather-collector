@@ -10,7 +10,7 @@
 
 (defn append-reading!
   [path timestamp temperature]
-  (when-not(.exists (io/file path))
+  (when-not (.exists (io/file path))
     (spit path header))
   (spit path (str timestamp "," temperature "\n") :append true))
 
@@ -37,7 +37,7 @@
   (append-reading! "scratch2.csv" "2026-08-25T14:00:00" 21.4)
 
   ;; need to split on comma in func
-  (rest (str/split-lines(slurp "scratch2.csv")))
+  (rest (str/split-lines (slurp "scratch2.csv")))
   (read-readings "scratch2.csv")
   (read-readings "nope.csv")
   )

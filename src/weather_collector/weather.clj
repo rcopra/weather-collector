@@ -10,7 +10,7 @@
                                          :appid api-key
                                          :units "metric"}
                           :as :json})]
-    (get-in resp[:body :main :temp])))
+    (get-in resp [:body :main :temp])))
 
 (comment
   (fetch-temperature "Berlin" (System/getenv "OPENWEATHER_API_KEY"))
