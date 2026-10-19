@@ -14,16 +14,19 @@
     (spit path header))
   (spit path (str timestamp "," temperature "\n") :append true))
 
+(defn- parse-line
+  [line]
+  (let [[timestamp temperature] (str/split line #",")]
+    {:timestamp timestamp
+     :temperature (parse-double temperature)}))
+
 (defn read-readings
   [path]
   (if (.exists (io/file path))
     (->> (slurp path)
          str/split-lines
          rest
-         (mapv (fn [line]
-                 (let [[timestamp temperature] (str/split line #",")]
-                   {:timestamp timestamp
-                    :temperature (parse-double temperature)}))))
+         (mapv parse-line))
     []))
 
 (comment
