@@ -1,44 +1,68 @@
 # weather-collector
 
-FIXME: description
+Fetches a city's current temperature from OpenWeatherMap once an hour, appends it to `<city>.csv`, and serves the readings as JSON over HTTP.
 
-## Installation
+The default city is **Berlin** (`berlin.csv`).
 
-Download from https://example.com/FIXME.
+## Setup
 
-## Usage
+You need Java, [Leiningen](https://leiningen.org) and an [OpenWeatherMap API key](https://home.openweathermap.org/api_keys).
 
-FIXME: explanation
+```sh
+cp .env.example .env   # then fill in OPENWEATHER_API_KEY
+set -a; source .env; set +a
+lein run
+```
 
-    $ java -jar weather-collector-0.1.0-standalone.jar [args]
+| Variable              | Default  |                         |
+|-----------------------|----------|-------------------------|
+| `OPENWEATHER_API_KEY` | none     | required, exits without it |
+| `CITY`                | `Berlin` | also names the CSV file |
+| `PORT`                | `3000`   |                         |
+| `DATA_DIR`            | `.`      | where the CSV is written |
 
-## Options
+## Example requests
 
-FIXME: listing of options this app accepts.
+```sh
+curl localhost:3000/temperatures
+# [{"timestamp":"2026-10-19T11:18:22","temperature":12.55},{"timestamp":"2026-10-19T12:35:20","temperature":11.82}]
+```
 
-## Examples
+Before the first reading has been saved:
 
-...
+```sh
+curl localhost:3000/temperatures
+# []
+```
 
-### Bugs
+Any other route returns `404`.
 
-...
+## Tests
 
-### Any Other Sections
-### That You Think
-### Might be Useful
+```sh
+lein test
+```
 
-## License
+## Layout
 
-Copyright © 2026 FIXME
+- `weather.clj`: calls the OpenWeatherMap API
+- `storage.clj`: appends to and reads the CSV
+- `http.clj`: Ring handler and Jetty server
+- `job.clj`: the hourly loop and failure handling
+- `main.clj`: reads config and starts everything
 
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-https://www.eclipse.org/legal/epl-2.0.
+Each namespace ends with a `(comment ...)` block. These are the REPL experiments I used to build it, left in as a record of how each piece came together.
 
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+## Assumptions
+
+- The first fetch happens at startup, then every hour after the previous one. It is not aligned to the top of the hour and drifts by however long each fetch takes.
+- Timestamps are UTC, in the same format as the example in the assignment pdf (no zone suffix).
+- The CSV is written to `DATA_DIR` (the working directory by default). The file name is the lower-cased city, so `CITY="New York"` writes `new york.csv`.
+- A failed fetch logs the error (including the API's response body) to stdout, writes nothing, and the next cycle tries again.
+- `/temperatures` reads the whole file on every request. This is fine at one row per hour.
+
+## In production I would
+
+- Use a logging library instead of `println`.
+- Use a real scheduler so fetches line up with the hour and the app can shut down cleanly.
+- Skip malformed rows instead of failing the whole request.
