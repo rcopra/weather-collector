@@ -51,7 +51,7 @@ lein test
 - `job.clj`: the hourly loop and failure handling
 - `main.clj`: reads config and starts everything
 
-Each namespace ends with a `(comment ...)` block. These are the REPL experiments I used to build it, left in as a record of how each piece came together.
+Each namespace except `main` ends with a `(comment ...)` block. These are the REPL experiments I used to build it, left in as a record of how each piece came together.
 
 ## Assumptions
 

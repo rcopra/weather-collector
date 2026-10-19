@@ -6,7 +6,7 @@
   (:gen-class))
 
 (defn- config []
-  {:api-key  (System/getenv "OPENWEATHER_API_KEY")
+  {:api-key  (not-empty (System/getenv "OPENWEATHER_API_KEY"))
    :city     (or (System/getenv "CITY") "Berlin")
    :port     (parse-long (or (System/getenv "PORT") "3000"))
    :data-dir (or (System/getenv "DATA_DIR") ".")})
