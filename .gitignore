@@ -12,3 +12,6 @@ pom.xml.asc
 .hgignore
 .hg/
 .env
+*.csv
+.lsp/.cache
+.clj-kondo/.cache
